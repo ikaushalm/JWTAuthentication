@@ -8,5 +8,8 @@ namespace JWTAuthentication.Models
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }
+        public DbSet<AppUser> AppUsers { get; set; }
+
+
     }
 }
