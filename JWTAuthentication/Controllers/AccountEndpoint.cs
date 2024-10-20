@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace JWTAuthentication.Controllers
 {
@@ -13,10 +15,19 @@ namespace JWTAuthentication.Controllers
 
         }
 
-
-        private static string GetUserProfile()
+        [Authorize]
+        private static async Task<IResult> GetUserProfile( UserManager<AppUser> usermanager,ClaimsPrincipal user)
         {
-            return "user Profile";
+            string User_id = user.Claims.First(x => x.Type == "userId").Value;
+            var userdetails = await usermanager.FindByIdAsync(User_id);
+
+            return Results.Ok(
+                new
+                {
+                    Name=userdetails?.FullName,
+                    Email=userdetails?.Email
+
+                });
 
         }
     }
