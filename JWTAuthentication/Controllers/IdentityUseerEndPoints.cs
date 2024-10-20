@@ -30,11 +30,14 @@ namespace JWTAuthentication.Controllers
             {
                 FullName = regmodel.fullName,
                 Email = regmodel.Email,
-                UserName = regmodel.Email
-
+                UserName = regmodel.Email,
+                Gender = regmodel.Gender,
+                DOB=DateOnly.FromDateTime(DateTime.Now.AddYears(-regmodel.Age)),
+                LibraryID = regmodel.LibraryID
             };
 
             var response = await usrmgr.CreateAsync(user, regmodel.Password);
+            await usrmgr.AddToRoleAsync(user, regmodel.Role);
 
             if (response.Succeeded)
             {
