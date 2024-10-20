@@ -61,13 +61,25 @@ namespace JWTAuthentication.Controllers
                 var signkey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(appsettings.Value.JWTSecret));
 
+                var roledesc =await  usrmgr.GetRolesAsync(user);
+
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim("userId",user.Id.ToString()),
+                    new Claim("gendercheck",user.Gender),
+                    new Claim("Age",(DateTime.Now.Year-user.DOB.Year).ToString()),
+                    new Claim(ClaimTypes.Role,roledesc.First())
+
+                });
+
+                if (user.LibraryID != null)
+                {
+                    claimsIdentity.AddClaim(new Claim("libraryid", user.LibraryID.ToString()!));
+                }
+
                 var tokendecriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(
-                    new Claim[]
-                    {
-            new Claim("userId", user.Id.ToString())
-                    }),
+                    Subject = new ClaimsIdentity(claimsIdentity),
                     Expires = DateTime.UtcNow.AddDays(1),
                     SigningCredentials = new SigningCredentials(
                         signkey, SecurityAlgorithms.HmacSha256)

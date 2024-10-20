@@ -63,6 +63,11 @@ namespace JWTAuthentication.Extensions
             {
                 options.FallbackPolicy = new AuthorizationPolicyBuilder()
                 .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser().Build();
+
+                options.AddPolicy("HasLibraryID", policy => policy.RequireClaim("libraryid"));
+                options.AddPolicy("FemalesOnly", policy => policy.RequireClaim("gendercheck","Female"));
+                options.AddPolicy("Under10", policy => policy.RequireAssertion(context =>
+                Int32.Parse(context.User.Claims.First(x => x.Type == "Age").Value) < 10));
             });
 
             return services;

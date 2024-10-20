@@ -19,13 +19,18 @@ namespace JWTAuthentication.Controllers
         private static async Task<IResult> GetUserProfile( UserManager<AppUser> usermanager,ClaimsPrincipal user)
         {
             string User_id = user.Claims.First(x => x.Type == "userId").Value;
+            //string gender = user.Claims.First(x => x.Type == "gender").Value;
+            //string User_id = user.Claims.First(x => x.Type == "userId").Value;
             var userdetails = await usermanager.FindByIdAsync(User_id);
+            var role_dec = await usermanager.GetRolesAsync(userdetails!);
 
             return Results.Ok(
                 new
                 {
                     Name=userdetails?.FullName,
-                    Email=userdetails?.Email
+                    Email=userdetails?.Email,
+                    Role= role_dec.First().ToString(),
+                    //gender= gender
 
                 });
 
