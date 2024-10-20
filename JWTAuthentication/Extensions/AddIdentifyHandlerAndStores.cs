@@ -1,5 +1,6 @@
 ﻿using JWTAuthentication.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection.Metadata.Ecma335;
@@ -36,20 +37,31 @@ namespace JWTAuthentication.Extensions
         public static IServiceCollection AddIdentityAuth(this IServiceCollection services,IConfiguration config)
         {
 
-               services.AddAuthentication(x => x.DefaultAuthenticateScheme =
-                x.DefaultChallengeScheme =
-                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
+               services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(y =>
                 {
                 y.SaveToken = false;
-                y.TokenValidationParameters = new TokenValidationParameters
-                {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(config["AppSettings:JWTSecret"]!))
+                    y.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(config["AppSettings:JWTSecret"]!)),
+                        //to validate issure and audience url  by default true
+                        ValidateIssuer =false,
+                        ValidateAudience=false
 
-                };
+
+                    };
                 });
+
+
+            //Added to make all endpoints only accessible to authorised user
+
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser().Build();
+            });
 
             return services;
         }

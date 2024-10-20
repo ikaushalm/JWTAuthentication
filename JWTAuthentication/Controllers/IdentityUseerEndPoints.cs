@@ -1,4 +1,5 @@
 ﻿using JWTAuthentication.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -22,7 +23,7 @@ namespace JWTAuthentication.Controllers
 
         }
 
-
+        [AllowAnonymous]
         private static async Task<IResult> CreateUser(UserManager<AppUser> usrmgr, [FromBody] RegistrationModel regmodel)
         {
             AppUser user = new AppUser
@@ -48,7 +49,7 @@ namespace JWTAuthentication.Controllers
 
 
 
-
+        [AllowAnonymous]
         private static async Task<IResult> SignIn(UserManager<AppUser> usrmgr, [FromBody] LoginModel lginmodel, IOptions<AppSettings> appsettings)
         {
             var user = await usrmgr.FindByEmailAsync(lginmodel.Email);
